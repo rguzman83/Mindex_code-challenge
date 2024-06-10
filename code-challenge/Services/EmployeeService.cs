@@ -44,12 +44,7 @@ namespace challenge.Services
         {
             if (!String.IsNullOrEmpty(id))
             {
-                var employee = _employeeRepository.GetReportStructure(id);
-                //ReportingStructure newWorker = new ReportingStructure { Employee = tempHolding, NumberOfReports = 1 };
-                //return newWorker;
-                return employee;
-
-                //return _employeeRepository.GetReportStructure(id);
+                return _employeeRepository.GetReportStructure(id);
             }
             return null;
         }
@@ -63,15 +58,20 @@ namespace challenge.Services
             return null;
         }
 
-        public Compensation AddEmployeeCompensation(Compensation employee)
+        public Compensation AddEmployeeCompensation(CompensationPost employee)
         {
             if (employee != null)
             {
-                _employeeRepository.AddComp(employee);
-                _employeeRepository.CompSaveAsync().Wait();
+                Compensation employeeCompesnation =  _employeeRepository.AddComp(employee, employee.EmployeeID);
+                if (employeeCompesnation != null)
+                {
+                    _employeeRepository.CompSaveAsync().Wait();
+                    return employeeCompesnation;
+                }
+                
             }
 
-            return employee;
+            return null;
         }
 
       

@@ -13,9 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using challenge.Repositories;
 using challenge.Services;
 
-#pragma warning disable NU1903
-#pragma warning disable NU1902
-
 namespace code_challenge
 {
     public class Startup

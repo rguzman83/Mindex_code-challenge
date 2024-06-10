@@ -39,7 +39,6 @@ namespace challenge.Data
 
                 List<Employee> employees = serializer.Deserialize<List<Employee>>(jr);
                 FixUpReferences(employees);
-                Console.WriteLine("Returning Employees for Saving");
                 return employees;
             }
         }
@@ -51,18 +50,15 @@ namespace challenge.Data
 
             employees.ForEach(employee =>
             {
-                Console.WriteLine("Loading Employee - " + employee.EmployeeId);
                 if (employee.DirectReports != null)
                 {
                     var referencedEmployees = new List<Employee>(employee.DirectReports.Count);
                     employee.DirectReports.ForEach(report =>
                     {
                         var referencedEmployee = employeeIdRefMap.First(e => e.Id == report.EmployeeId).EmployeeRef;
-                        Console.WriteLine("Loading direct report ID - " + referencedEmployee.EmployeeId);
                         referencedEmployees.Add(referencedEmployee);
                     });
                     employee.DirectReports = referencedEmployees;
-                    Console.WriteLine("Done loading direct reports");
                 }
             });
         }

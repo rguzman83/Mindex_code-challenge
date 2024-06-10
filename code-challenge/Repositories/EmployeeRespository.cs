@@ -13,13 +13,13 @@ namespace challenge.Repositories
     public class EmployeeRespository : IEmployeeRepository
     {
         private readonly EmployeeContext _employeeContext;
-        private readonly CompensationContext _compositionContext;
+        private readonly CompensationContext _compensationContext;
         private readonly ILogger<IEmployeeRepository> _logger;
 
         public EmployeeRespository(ILogger<IEmployeeRepository> logger, EmployeeContext employeeContext, CompensationContext compensationContext)
         {
             _employeeContext = employeeContext;
-            _compositionContext = compensationContext;
+            _compensationContext = compensationContext;
             _logger = logger;
         }
 
@@ -31,16 +31,7 @@ namespace challenge.Repositories
         }
 
         public Employee GetById(string id)
-        {
-            /*
-            var tempHolder = _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
-            _employeeContext.Entry(tempHolder).Collection(e => e.DirectReports).Load();
-            return tempHolder;
-            */
-            //return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
-
-            //IEnumerable<Employee> tempHoldings = _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
-            //return _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
+        { 
 
             //Due to Lazy loading issues with Entity Frameowrk, .Include is necessary to reference DirectReports
             var employee = _employeeContext.Employees.Include(e => e.DirectReports).SingleOrDefault(e => e.EmployeeId == id);
@@ -52,17 +43,36 @@ namespace challenge.Repositories
 
         public Compensation GetCompById(string id)
         {
-            var employee = _compositionContext.Compensations.SingleOrDefault(c => c.EmployeeID == id);
+            Compensation employee = _compensationContext.Compensations.Include(c => c.Employee).SingleOrDefault(c => c.Employee.EmployeeId == id);
             if (employee == null)
                 return null;
             return employee;
         }
 
 
-        public Compensation AddComp(Compensation compensation)
+        public Compensation AddComp(CompensationPost compensation, string id)
         {
-            _compositionContext.Compensations.Add(compensation);
-            return compensation;
+            var employee = _employeeContext.Employees.SingleOrDefault(e => e.EmployeeId == id);
+            Compensation employeeCompensation = _compensationContext.Compensations.SingleOrDefault(c => c.Employee.EmployeeId == id);
+            if (employee == null)
+                return null;
+            if (employeeCompensation == null)
+            {
+                Compensation newRecord = new Compensation
+                {
+                    Employee = employee,
+                    Salary = compensation.Salary,
+                    EffectiveDate = compensation.EffectiveDate
+                };
+                employeeCompensation = newRecord;
+                _compensationContext.Compensations.Add(employeeCompensation);
+            }
+            else //Normally this would be in a sperate PUT/PATCH action - putting here just as PoC
+            {
+                employeeCompensation.Salary = compensation.Salary;
+                employeeCompensation.EffectiveDate = compensation.EffectiveDate;
+            }
+            return employeeCompensation;
         }
 
         private void LoadDirectReports(Employee employee)
@@ -79,15 +89,12 @@ namespace challenge.Repositories
         }
 
         public ReportingStructure GetReportStructure(string id)
-        {
-            //Direct Copy of Get Worker Code for the moment
+        { 
             var employee = new ReportingStructure();
             var starterEmployee = _employeeContext.Employees.Include(e => e.DirectReports).SingleOrDefault(e => e.EmployeeId == id);
             LoadDirectReports(starterEmployee);
             employee.Employee = starterEmployee;
-            //employee.NumberOfReports = 1;
             employee.NumberOfReports = GetReportCount(starterEmployee, 0);
-            //LoadReportStruct(employee);
             return employee;
 
         }
@@ -96,17 +103,10 @@ namespace challenge.Repositories
         {
             if (employee != null)
             {
-                Console.WriteLine("EE = " + employee.FirstName);
-                if (employee.DirectReports != null)
-                    Console.WriteLine("DR Count = " + employee.DirectReports.Count);
-                //int intCount = 0;
-                //employee.NumberOfReports = employee.Employee.DirectReports.Count;
-                //employee.Employee.FirstName = "UPDATED";
                 if (employee.DirectReports != null)
                 {
                     foreach (var directReport in employee.DirectReports)
                     {
-                        Console.WriteLine(directReport.EmployeeId);
                         intCount += 1 + GetReportCount(directReport, 0);
                     }
 
@@ -122,7 +122,7 @@ namespace challenge.Repositories
 
         public Task CompSaveAsync()
         {
-            return _compositionContext.SaveChangesAsync();
+            return _compensationContext.SaveChangesAsync();
         }
 
         public Employee Remove(Employee employee)

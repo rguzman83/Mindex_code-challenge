@@ -15,7 +15,6 @@ namespace challenge.Data
         }
 
         public DbSet<Employee> Employees { get; set; }
-        //public DbSet<ReportingStructure> ReportingStruc { get; set; }
     }
 
     public class CompensationContext : DbContext
@@ -26,7 +25,6 @@ namespace challenge.Data
         }
 
         public DbSet<Compensation> Compensations { get; set; }
-        //public DbSet<ReportingStructure> ReportingStruc { get; set; }
     }
 
 }

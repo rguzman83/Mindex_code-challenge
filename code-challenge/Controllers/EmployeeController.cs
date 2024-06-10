@@ -49,8 +49,6 @@ namespace challenge.Controllers
         {
             _logger.LogDebug($"Received report structure get request for '{id}'");
             var employeeWithStruct = _employeeService.GetReportStructure(id);
-
-            //Console.WriteLine("ID pinged - " + id);
             if (employeeWithStruct.Employee == null)
                 return NotFound();
             return Ok(employeeWithStruct);
@@ -68,11 +66,13 @@ namespace challenge.Controllers
         }
 
         [HttpPost("compensation/{id}")]
-        public IActionResult CreateCompensation([FromBody] Compensation employee)
+        public IActionResult CreateCompensation([FromBody] CompensationPost employee)
         {
             _logger.LogDebug($"Recieved compensation request for '{employee.EmployeeID}'");
 
-            _employeeService.AddEmployeeCompensation(employee);
+            var employeeCompensation = _employeeService.AddEmployeeCompensation(employee);
+            if (employeeCompensation == null)
+                return NotFound();
             return CreatedAtRoute("getEmployeeCompensation", new {id = employee.EmployeeID}, employee);
         }
 

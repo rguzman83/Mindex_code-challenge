@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,11 +25,18 @@ namespace challenge.Models
         public Employee Employee { get; set; }
     }
 
-    public class Compensation
+    public class CompensationPost // Class for POST Format
     {
-        //public Employee Employee { get; set; } // Actual Data
-        [Key]
-        public string EmployeeID { get; set; } // For Testing Only
+        public string EmployeeID { get; set; }
+        public double Salary { get; set; }
+        public DateTime EffectiveDate { get; set; }
+    }
+
+    public class Compensation // Class for return data
+    {
+        [JsonIgnore] //force-creating a primary key that I want to have not output in the JSON return.
+        public string CompensationID { get; set; }  
+        public Employee Employee { get; set; } // Would prefer to get Primary/Foreign key from here
         public double Salary { get; set; }
         public DateTime EffectiveDate { get; set; }
     }

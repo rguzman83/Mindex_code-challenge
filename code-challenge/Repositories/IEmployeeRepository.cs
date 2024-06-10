@@ -11,7 +11,7 @@ namespace challenge.Repositories
         Employee Remove(Employee employee);
         ReportingStructure GetReportStructure(String id);
         Compensation GetCompById(String id);
-        Compensation AddComp(Compensation compensation);
+        Compensation AddComp(CompensationPost compensation, String id);
         Task SaveAsync();
         Task CompSaveAsync();
     }
