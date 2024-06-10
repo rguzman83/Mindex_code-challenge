@@ -21,7 +21,7 @@ namespace challenge.Services
 
         public Employee Create(Employee employee)
         {
-            if(employee != null)
+            if (employee != null)
             {
                 _employeeRepository.Add(employee);
                 _employeeRepository.SaveAsync().Wait();
@@ -32,7 +32,7 @@ namespace challenge.Services
 
         public Employee GetById(string id)
         {
-            if(!String.IsNullOrEmpty(id))
+            if (!String.IsNullOrEmpty(id))
             {
                 return _employeeRepository.GetById(id);
             }
@@ -44,11 +44,11 @@ namespace challenge.Services
         {
             if (!String.IsNullOrEmpty(id))
             {
-                var tempHolding = _employeeRepository.GetReportStructure(id);
+                var employee = _employeeRepository.GetReportStructure(id);
                 //ReportingStructure newWorker = new ReportingStructure { Employee = tempHolding, NumberOfReports = 1 };
                 //return newWorker;
-                return tempHolding;
-                
+                return employee;
+
                 //return _employeeRepository.GetReportStructure(id);
             }
             return null;
@@ -56,8 +56,25 @@ namespace challenge.Services
 
         public Compensation GetEmployeeCompensation(string id)
         {
+            if (!String.IsNullOrEmpty(id))
+            {
+                return _employeeRepository.GetCompById(id);
+            }
             return null;
         }
+
+        public Compensation AddEmployeeCompensation(Compensation employee)
+        {
+            if (employee != null)
+            {
+                _employeeRepository.AddComp(employee);
+                _employeeRepository.CompSaveAsync().Wait();
+            }
+
+            return employee;
+        }
+
+      
 
         public Employee Replace(Employee originalEmployee, Employee newEmployee)
         {

@@ -24,7 +24,9 @@ namespace challenge.Models
 
     public class Compensation
     {
-        public Employee Employee { get; set; }
+        //public Employee Employee { get; set; } // Actual Data
+        [Key]
+        public string EmployeeID { get; set; } // For Testing Only
         public double Salary { get; set; }
         public DateTime EffectiveDate { get; set; }
     }

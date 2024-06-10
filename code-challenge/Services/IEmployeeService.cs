@@ -11,6 +11,7 @@ namespace challenge.Services
         Employee GetById(String id);
         ReportingStructure GetReportStructure(String id);
         Compensation GetEmployeeCompensation(String id);
+        Compensation AddEmployeeCompensation(Compensation employee);
         Employee Create(Employee employee);
         Employee Replace(Employee originalEmployee, Employee newEmployee);
     }
