@@ -94,20 +94,21 @@ namespace challenge.Repositories
             var starterEmployee = _employeeContext.Employees.Include(e => e.DirectReports).SingleOrDefault(e => e.EmployeeId == id);
             LoadDirectReports(starterEmployee);
             employee.Employee = starterEmployee;
-            employee.NumberOfReports = GetReportCount(starterEmployee, 0);
+            employee.NumberOfReports = GetReportCount(starterEmployee);
             return employee;
 
         }
 
-        public int GetReportCount(Employee employee, int intCount)
+        public int GetReportCount(Employee employee)
         {
+            int intCount = 0;
             if (employee != null)
             {
                 if (employee.DirectReports != null)
                 {
                     foreach (var directReport in employee.DirectReports)
                     {
-                        intCount += 1 + GetReportCount(directReport, 0);
+                        intCount += 1 + GetReportCount(directReport);
                     }
 
                 }
