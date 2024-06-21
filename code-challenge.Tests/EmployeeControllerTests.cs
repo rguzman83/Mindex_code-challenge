@@ -138,5 +138,82 @@ namespace code_challenge.Tests.Integration
             // Assert
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [TestMethod]
+        public void GetReportCountById_Returns_Ok()
+        {
+            // Arrange
+            var employeeId = "16a596ae-edd3-4847-99fe-c4518e82c86f";
+            var expectedCount = 4;
+
+            // Execute
+            var getRequestTask = _httpClient.GetAsync($"api/employee/reporting/{employeeId}");
+            var response = getRequestTask.Result;
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            var reporting = response.DeserializeContent<ReportingStructure>();
+            Assert.AreEqual(expectedCount, reporting.NumberOfReports);
+        }
+
+        [TestMethod]
+        public void AddEmployeeCompensation_Returns_Created()
+        {
+            // Arrange
+
+            var compensationRecord = new CompensationPost()
+            {
+                EmployeeID = "16a596ae-edd3-4847-99fe-c4518e82c86f",
+                Salary = 50.00,
+                EffectiveDate = DateTime.Parse("2024-06-02T00:00:00Z")
+            };
+            var requestContent = new JsonSerialization().ToJson(compensationRecord);
+
+            // Execute
+            var postRequestTask = _httpClient.PostAsync($"api/employee/compensation/{compensationRecord.EmployeeID}",
+               new StringContent(requestContent, Encoding.UTF8, "application/json"));
+            var postResponse = postRequestTask.Result;
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.Created, postResponse.StatusCode);
+            var newCompensationRecord = postResponse.DeserializeContent<CompensationPost>();
+
+            Assert.AreEqual(newCompensationRecord.EmployeeID, compensationRecord.EmployeeID);
+            Assert.AreEqual(newCompensationRecord.Salary, compensationRecord.Salary);
+        }
+
+
+        [TestMethod]
+        public void GetEmployeeCompensationById_Returns_OK()
+        {
+            // Arrange
+            var expectedFirstName = "Paul";
+            var expectedLastName = "McCartney";
+
+            var compensationRecord = new CompensationPost()
+            {
+                EmployeeID = "b7839309-3348-463b-a7e3-5de1c168beb3",
+                Salary = 50.00,
+                EffectiveDate = DateTime.Parse("2024-06-02T00:00:00Z")
+            };
+            var requestContent = new JsonSerialization().ToJson(compensationRecord);
+
+            // Execute
+            var postRequestTask = _httpClient.PostAsync($"api/employee/compensation/{compensationRecord.EmployeeID}",
+               new StringContent(requestContent, Encoding.UTF8, "application/json"));
+            var getRequestTask = _httpClient.GetAsync($"api/employee/compensation/{compensationRecord.EmployeeID}");
+
+            var getResponse = getRequestTask.Result;
+
+            // Assert
+            Assert.AreEqual(HttpStatusCode.OK, getResponse.StatusCode);
+            var newCompensationRecord = getResponse.DeserializeContent<Compensation>();
+
+            Assert.AreEqual(newCompensationRecord.Employee.EmployeeId, compensationRecord.EmployeeID);
+            Assert.AreEqual(newCompensationRecord.Employee.FirstName, expectedFirstName);
+            Assert.AreEqual(newCompensationRecord.Employee.LastName, expectedLastName);
+            Assert.AreEqual(newCompensationRecord.Salary, compensationRecord.Salary);
+        }
     }
 }
+
